@@ -1,0 +1,34 @@
+enable:
+  issues: true
+  prs: true
+
+labels:
+  ':bug: BUG':
+    include: ['\bFix\b', '\bfix\b', '\bFIX\b', '\bBug\b', '\bbug\b', '\bBUG\b']
+
+  ':hammer: REFACTOR':
+    include:
+      ['\bRefactor\b', '\bREFACTOR\b', '\brefactor\b']
+  
+  ':lipstick: DESIGN':
+    include:
+      ['\bDesign\b', '\bDESIGN\b', '\bdesign\b']
+
+  ':pencil2: DOCS':
+    include:
+      ['\bDocs\b', '\bDOCS\b', '\bdocs\b']
+
+  ':sparkles: FEAT':
+    include: ['\bFeat\b', '\bFEAT\b', '\bfeat\b']
+
+  ':tada: INIT':
+    include:
+      ['\bInit\b', '\bINIT\b', '\binit\b']
+
+  ':left_speech_bubble: COMMENT':
+    include:
+      ['\bComment\b', '\bCOMMENT\b', '\bcomment\b']
+
+  ':broom: CHORE':
+    include:
+      ['\bCHORE\b', '\bChore\b', '\bchore\b']
