@@ -1,8 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { CreateUserDto } from 'src/application/DB/users/dto/create-user.dto';
-import { UsersService } from 'src/application/DB/users/users.service';
-import { User, UserDocument } from 'src/application/DB/users/schemas/user.schema';
-import { LoginDto } from 'src/application/DB/users/dto/login.dto';
+import { CreateUserDto } from 'src/application/auth/dto/create-user.dto';
+import { UserQuery } from 'src/application/DB/query/user.query';
+import { User, UserDocument } from 'src/application/DB/entity/user.entity';
+import { LoginDto } from 'src/application/auth/dto/login.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { Types } from 'mongoose';
@@ -16,17 +16,16 @@ interface UserPayload {
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
+    private userQuery: UserQuery,
     private jwtService: JwtService,
   ) {}
 
   async registerUser(newUser: CreateUserDto): Promise<UserDocument> {
-    return await this.usersService.createUser(newUser);
+    return await this.userQuery.createUser(newUser);
   }
   async validateUser(loginDto: LoginDto): Promise<UserPayload | null> {
     const { email, password } = loginDto;
-    const user: UserDocument | null =
-      await this.usersService.findByEmail(email);
+    const user: UserDocument | null = await this.userQuery.findByEmail(email);
 
     if (user && (await bcrypt.compare(password, user.password))) {
       const userObject = user.toObject<User>();
