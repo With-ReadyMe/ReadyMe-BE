@@ -3,17 +3,16 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { LoggingModule } from './core/interceptors/logging/logging.module';
 import { AuthModule } from './application/auth/auth.module';
 import { DbModule } from './application/DB/db.module';
 
 @Module({
   imports: [
-    // 2. ConfigModule을 전역(Global)으로 설정하여 어디서든 환경 변수에 접근 가능하게 함
     ConfigModule.forRoot({
       isGlobal: true,
     }),
 
-    // 3. MongooseModule에 forRootAsync 적용
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -22,6 +21,7 @@ import { DbModule } from './application/DB/db.module';
       inject: [ConfigService], // ConfigService 주입
     }),
 
+    LoggingModule,
     AuthModule,
     DbModule,
   ],
