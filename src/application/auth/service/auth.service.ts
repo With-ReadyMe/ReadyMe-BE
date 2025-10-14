@@ -122,4 +122,15 @@ export class AuthService {
       throw error;
     }
   }
+
+  async logout(id: string, email: string) {
+    try {
+      await this.userQuery.removeRefreshToken(id);
+      this.logger.log(`AuthService.logout success: ${email}`);
+    } catch (error) {
+      this.logger.error(`AuthService.logout failed`);
+      this.logger.error(error);
+      throw error;
+    }
+  }
 }
