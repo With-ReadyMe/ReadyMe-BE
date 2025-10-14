@@ -1,3 +1,9 @@
+export interface JsonResponseObject {
+  code: number;
+  message: string;
+  [key: string]: unknown;
+}
+
 export class JsonResponse extends Map {
   constructor() {
     super();
@@ -13,10 +19,15 @@ export class JsonResponse extends Map {
     return super.set(key, value);
   }
 
-  public of(): any {
-    const jsonResult = {};
+  public of(): JsonResponseObject {
+    const jsonResult: JsonResponseObject = {
+      code: this.get('code') as number,
+      message: this.get('message') as string,
+    };
     for (const [key, value] of this.entries()) {
-      jsonResult[key as string] = value;
+      if (key !== 'code' && key !== 'message') {
+        jsonResult[key as string] = value;
+      }
     }
     return jsonResult;
   }
