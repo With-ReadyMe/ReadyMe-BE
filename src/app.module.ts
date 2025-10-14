@@ -15,13 +15,13 @@ import { LoggingModule } from './core/interceptors/logging/logging.module';
       isGlobal: true,
     }),
 
-    // MongoDB 연결 설정 (비동기 방식)
+    // MongoDB 연결 설정
     MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        uri: configService.get<string>('DATABASE_URL'),
-      }),
       inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        uri: configService.get<string>('MONGODB_URI'),
+        dbName: configService.get<string>('MONGODB_DB'),
+      }),
     }),
 
     LoggingModule,

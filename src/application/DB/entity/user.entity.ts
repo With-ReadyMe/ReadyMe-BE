@@ -14,7 +14,7 @@ export class User {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ unique: true, required: true })
+  @Prop({ required: true, unique: true })
   phone: string;
 
   @Prop({
@@ -27,8 +27,11 @@ export class User {
   @Prop({ required: true })
   birth: Date;
 
-  @Prop({ type: Object, required: true })
-  address: any;
+  @Prop({ required: true })
+  address: string;
+
+  @Prop({ required: false })
+  refreshToken?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
