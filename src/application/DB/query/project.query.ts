@@ -12,11 +12,11 @@ export class ProjectQuery {
 
   async createProject(
     createProjectDto: CreateProjectDto,
-    userId: string,
+    user_id: string,
   ): Promise<ProjectDocument> {
     const projectData = {
       ...createProjectDto,
-      userId: new Types.ObjectId(userId),
+      user_id: new Types.ObjectId(user_id),
       other_links: createProjectDto.other_links || [],
     };
     const createdProject = new this.projectModel(projectData);

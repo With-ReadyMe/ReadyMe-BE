@@ -8,7 +8,7 @@ export type ProjectDocument = Project & Document;
 })
 export class Project {
   @Prop({ type: Types.ObjectId, ref: 'User', required: true, index: true })
-  userId: Types.ObjectId;
+  user_id: Types.ObjectId;
 
   @Prop({ required: true, type: String })
   title: string;
