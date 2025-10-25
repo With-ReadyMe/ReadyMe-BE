@@ -1,27 +1,45 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-export type ProjectsDocument = Project & Document;
+export type ProjectDocument = Project & Document;
 
-@Schema({ timestamps: true })
+@Schema({
+  timestamps: true,
+})
 export class Project {
   @Prop({ type: Types.ObjectId, ref: 'User', required: true, index: true })
   userId: Types.ObjectId;
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: String })
   title: string;
 
-  @Prop({ required: true })
-  status: string;
-
-  @Prop({ type: Number })
+  @Prop({ type: Number, required: true })
   dev_count: number;
 
-  @Prop()
-  my_role: string;
+  @Prop({ type: String })
+  cover_url: string;
 
-  @Prop()
+  @Prop({ type: String })
   archon_link: string;
+
+  @Prop({
+    type: String,
+    enum: ['draft', 'processing', 'ready', 'error', 'archived'],
+    default: 'draft',
+    required: true,
+  })
+  status: string;
+
+  @Prop({
+    type: String,
+    enum: ['public', 'unlisted', 'private'],
+    default: 'private',
+    required: true,
+  })
+  visibility: string;
+
+  @Prop({ type: String })
+  my_role: string;
 
   @Prop([String])
   other_links: string[];
@@ -32,17 +50,14 @@ export class Project {
   @Prop({ type: Date })
   period_end: Date;
 
-  @Prop()
-  thumbnail_url: string;
-
-  @Prop()
+  @Prop({ type: String })
   theme: string;
 
-  @Prop()
+  @Prop({ type: String })
   markdown: string;
-
-  @Prop()
-  visibility: string;
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);
+
+ProjectSchema.index({ status: 1, visibility: 1 });
+ProjectSchema.index({ title: 1 });
