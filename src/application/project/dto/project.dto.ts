@@ -1,5 +1,6 @@
 import {
   IsDateString,
+  IsEnum,
   IsInt,
   IsNotEmpty,
   IsOptional,
@@ -36,4 +37,9 @@ export class CreateProjectDto {
   @IsDateString()
   @IsNotEmpty()
   period_end: string;
+
+  @IsString()
+  @IsEnum(['public', 'unlisted', 'private'])
+  @IsOptional()
+  visibility?: string;
 }
