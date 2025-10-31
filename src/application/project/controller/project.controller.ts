@@ -3,13 +3,15 @@ import {
   Controller,
   Get,
   HttpStatus,
+  Param,
+  Patch,
   Post,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { ProjectService } from '../service/project.service';
 import { AuthGuard } from '../../../core/guard/auth.guard';
-import { CreateProjectDto } from '../dto/project.dto';
+import { CreateProjectDto, UpdateProjectDto } from '../dto/project.dto';
 import { User, UserInfo } from 'src/core/guard/decorator/user.decorator';
 import { ProjectDocument } from 'src/application/DB/entity/project.entity';
 
@@ -49,6 +51,25 @@ export class ProjectController {
       statusCode: HttpStatus.OK,
       message: '프로젝트 목록 조회 성공',
       data: projects,
+    };
+  }
+
+  @Patch('/update/:projectId')
+  async updateProject(
+    @Param('projectId') projectId: string,
+    @Body() updateProjectDto: UpdateProjectDto,
+    @User() user: UserInfo,
+  ) {
+    const updatedProject = await this.projectService.updateProject(
+      user.id,
+      projectId,
+      updateProjectDto,
+    );
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: '프로젝트가 성공적으로 수정되었습니다.',
+      data: updatedProject,
     };
   }
 }

@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Project, ProjectDocument } from '../entity/project.entity';
 import { Model, Types } from 'mongoose';
-import { CreateProjectDto } from 'src/application/project/dto/project.dto';
+import {
+  CreateProjectDto,
+  UpdateProjectDto,
+} from 'src/application/project/dto/project.dto';
 
 @Injectable()
 export class ProjectQuery {
@@ -29,5 +32,24 @@ export class ProjectQuery {
       .find({ user_id: new Types.ObjectId(user_id) })
       .sort({ created_at: -1 })
       .exec();
+  }
+
+  async findById(projectId: string): Promise<ProjectDocument | null> {
+    return this.projectModel.findById(new Types.ObjectId(projectId)).exec();
+  }
+
+  async updateProject(
+    projectId: string,
+    updateData: UpdateProjectDto,
+  ): Promise<ProjectDocument | null> {
+    const project = await this.projectModel
+      .findOneAndUpdate(
+        { _id: new Types.ObjectId(projectId) },
+        { $set: updateData },
+        { new: true },
+      )
+      .exec();
+
+    return project;
   }
 }

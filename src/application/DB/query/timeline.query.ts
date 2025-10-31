@@ -6,7 +6,7 @@ import {
   TimelineType,
 } from '../entity/timeline.entity';
 import { Model, Types } from 'mongoose';
-import { Project } from '../entity/project.entity';
+import { Project, ProjectDocument } from '../entity/project.entity';
 
 @Injectable()
 export class TimelineQuery {
@@ -35,5 +35,44 @@ export class TimelineQuery {
     });
 
     return createdTimeline.save();
+  }
+  async updateTimelineForProject(
+    project: ProjectDocument,
+  ): Promise<TimelineDocument> {
+    const filter = {
+      'details.projectId': project._id,
+      user_id: project.user_id,
+      type: TimelineType.PROJECT,
+    };
+
+    const updateData = {
+      title: project.title,
+
+      org: null,
+
+      role: project.my_role,
+
+      link_url: project.archon_link || null,
+
+      details: {
+        projectId: project._id,
+        dev_count: project.dev_count,
+        other_links: project.other_links || [],
+      },
+
+      start_at: project.period_start,
+      end_at: project.period_end || null,
+      updated_at: new Date(),
+    };
+
+    const updatedTimeline = await this.timelineModel
+      .findOneAndUpdate(filter, { $set: updateData }, { new: true })
+      .exec();
+
+    if (!updatedTimeline) {
+      throw new Error('Timeline not found');
+    }
+
+    return updatedTimeline;
   }
 }
