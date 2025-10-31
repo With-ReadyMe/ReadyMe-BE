@@ -1,15 +1,29 @@
 import { Injectable } from '@nestjs/common';
 import { CreateProjectDto } from '../dto/project.dto';
-import { Project } from 'src/application/DB/entity/project.entity';
+import {
+  Project,
+  ProjectDocument,
+} from 'src/application/DB/entity/project.entity';
 import { ProjectQuery } from 'src/application/DB/query/project.query';
+import { TimelineQuery } from 'src/application/DB/query/timeline.query';
 
 @Injectable()
 export class ProjectService {
-  constructor(private readonly projectQuery: ProjectQuery) {}
+  constructor(
+    private readonly projectQuery: ProjectQuery,
+    private readonly timelineQuery: TimelineQuery,
+  ) {}
   async createProject(
     user_id: string,
     createProjectDto: CreateProjectDto,
   ): Promise<Project> {
-    return this.projectQuery.createProject(createProjectDto, user_id);
+    const project: ProjectDocument = await this.projectQuery.createProject(
+      createProjectDto,
+      user_id,
+    );
+
+    await this.timelineQuery.createTimelineForProject(user_id, project);
+
+    return project;
   }
 }
