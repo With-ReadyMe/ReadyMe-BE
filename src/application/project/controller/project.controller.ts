@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpStatus,
   Post,
   UnauthorizedException,
@@ -10,6 +11,7 @@ import { ProjectService } from '../service/project.service';
 import { AuthGuard } from '../../../core/guard/auth.guard';
 import { CreateProjectDto } from '../dto/project.dto';
 import { User, UserInfo } from 'src/core/guard/decorator/user.decorator';
+import { ProjectDocument } from 'src/application/DB/entity/project.entity';
 
 @UseGuards(AuthGuard)
 @Controller('project')
@@ -33,6 +35,20 @@ export class ProjectController {
       statusCode: HttpStatus.CREATED,
       message: '프로젝트가 성공적으로 등록되었습니다.',
       data: project,
+    };
+  }
+
+  @Get()
+  async getProjects(@User() user: UserInfo): Promise<object> {
+    const userId = user.id;
+
+    const projects: ProjectDocument[] =
+      await this.projectService.findUserProjects(userId);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: '프로젝트 목록 조회 성공',
+      data: projects,
     };
   }
 }

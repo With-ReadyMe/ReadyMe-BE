@@ -23,4 +23,11 @@ export class ProjectQuery {
 
     return createdProject.save();
   }
+
+  async findProjectsByUserId(user_id: string): Promise<ProjectDocument[]> {
+    return this.projectModel
+      .find({ user_id: new Types.ObjectId(user_id) })
+      .sort({ created_at: -1 })
+      .exec();
+  }
 }

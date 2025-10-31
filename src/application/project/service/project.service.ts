@@ -26,4 +26,9 @@ export class ProjectService {
 
     return project;
   }
+  async findUserProjects(userId: string): Promise<ProjectDocument[]> {
+    const projects = await this.projectQuery.findProjectsByUserId(userId);
+
+    return projects;
+  }
 }
