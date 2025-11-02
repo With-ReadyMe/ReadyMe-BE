@@ -52,4 +52,16 @@ export class ProjectQuery {
 
     return project;
   }
+
+  async findByIdAndUserId(
+    projectId: string,
+    userId: string,
+  ): Promise<ProjectDocument | null> {
+    return this.projectModel
+      .findOne({
+        _id: new Types.ObjectId(projectId),
+        user_id: new Types.ObjectId(userId),
+      })
+      .exec();
+  }
 }

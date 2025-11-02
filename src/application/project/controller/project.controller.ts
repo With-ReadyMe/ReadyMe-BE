@@ -72,4 +72,21 @@ export class ProjectController {
       data: updatedProject,
     };
   }
+
+  @Get('/:projectId')
+  async getProjectById(
+    @Param('projectId') projectId: string,
+    @User() user: UserInfo,
+  ) {
+    const project = await this.projectService.getProjectDetail(
+      user.id,
+      projectId,
+    );
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: '프로젝트 조회 성공',
+      data: project,
+    };
+  }
 }

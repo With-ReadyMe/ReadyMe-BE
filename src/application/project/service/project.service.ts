@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateProjectDto, UpdateProjectDto } from '../dto/project.dto';
 import {
   Project,
@@ -72,5 +76,27 @@ export class ProjectService {
     }
 
     return updatedProject;
+  }
+
+  async getProjectDetail(
+    userId: string | null,
+    projectId: string,
+  ): Promise<ProjectDocument> {
+    const project = await this.projectQuery.findById(projectId);
+
+    if (!project) {
+      throw new NotFoundException('해당 ID의 프로젝트를 찾을 수 없습니다.');
+    }
+
+    const isOwner = userId !== null && project.user_id.toHexString() === userId;
+
+    if (
+      !isOwner &&
+      (project.visibility === 'private' || project.visibility === 'unlisted')
+    ) {
+      throw new ForbiddenException('해당 프로젝트를 조회할 권한이 없습니다.');
+    }
+
+    return project;
   }
 }
