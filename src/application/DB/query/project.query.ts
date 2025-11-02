@@ -74,4 +74,13 @@ export class ProjectQuery {
       user_id: new Types.ObjectId(userId),
     });
   }
+
+  async findPublicProjects(): Promise<ProjectDocument[]> {
+    return this.projectModel
+      .find({
+        visibility: 'public',
+      })
+      .sort({ created_at: -1 })
+      .exec();
+  }
 }
