@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Param,
@@ -87,6 +88,18 @@ export class ProjectController {
       statusCode: HttpStatus.OK,
       message: '프로젝트 조회 성공',
       data: project,
+    };
+  }
+
+  @Delete('/:projectId')
+  async deleteProject(
+    @Param('projectId') projectId: string,
+    @User() user: UserInfo,
+  ): Promise<object> {
+    await this.projectService.deleteProject(user.id, projectId);
+    return {
+      statusCode: HttpStatus.OK,
+      message: '프로젝트가 성공적으로 삭제되었습니다.',
     };
   }
 }

@@ -75,4 +75,15 @@ export class TimelineQuery {
 
     return updatedTimeline;
   }
+
+  async deleteTimelineForProject(
+    projectId: string,
+    userId: string,
+  ): Promise<void> {
+    await this.timelineModel.deleteOne({
+      'details.projectId': new Types.ObjectId(projectId),
+      user_id: new Types.ObjectId(userId),
+      type: TimelineType.PROJECT,
+    });
+  }
 }

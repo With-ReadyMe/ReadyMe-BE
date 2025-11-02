@@ -10,6 +10,7 @@ import {
 } from 'src/application/DB/entity/project.entity';
 import { ProjectQuery } from 'src/application/DB/query/project.query';
 import { TimelineQuery } from 'src/application/DB/query/timeline.query';
+import { DeleteResult } from 'mongoose';
 
 @Injectable()
 export class ProjectService {
@@ -98,5 +99,28 @@ export class ProjectService {
     }
 
     return project;
+  }
+
+  async deleteProject(userId: string, projectId: string): Promise<void> {
+    const deleteResult: DeleteResult = await this.projectQuery.deleteProject(
+      projectId,
+      userId,
+    );
+
+    if (deleteResult.deletedCount === 0) {
+      throw new NotFoundException(
+        '해당 프로젝트를 찾을 수 없거나 삭제 권한이 없습니다.',
+      );
+    }
+
+    try {
+      await this.timelineQuery.deleteTimelineForProject(projectId, userId);
+    } catch (error) {
+      console.error(
+        `[Timeline Sync ERROR] Failed to delete timeline for Project ID: ${projectId}`,
+        error,
+      );
+    }
+    return;
   }
 }

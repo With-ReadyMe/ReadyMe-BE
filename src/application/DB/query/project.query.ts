@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Project, ProjectDocument } from '../entity/project.entity';
-import { Model, Types } from 'mongoose';
+import { DeleteResult, Model, Types } from 'mongoose';
 import {
   CreateProjectDto,
   UpdateProjectDto,
@@ -63,5 +63,15 @@ export class ProjectQuery {
         user_id: new Types.ObjectId(userId),
       })
       .exec();
+  }
+
+  async deleteProject(
+    projectId: string,
+    userId: string,
+  ): Promise<DeleteResult> {
+    return this.projectModel.deleteOne({
+      _id: new Types.ObjectId(projectId),
+      user_id: new Types.ObjectId(userId),
+    });
   }
 }
