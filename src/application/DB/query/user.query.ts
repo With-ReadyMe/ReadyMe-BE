@@ -26,6 +26,10 @@ export class UserQuery {
     return createdUser.save();
   }
 
+  async updateUserInfo(id: string, updateUserDto): Promise<void> {
+    await this.userModel.findByIdAndUpdate(id, { updateUserDto }).exec();
+  }
+
   async updateRefreshToken(id: string, refreshToken: string): Promise<void> {
     await this.userModel.findByIdAndUpdate(id, { refreshToken }).exec();
   }
