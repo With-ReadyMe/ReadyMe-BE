@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Put,
+  Delete,
   Body,
   UsePipes,
   UseGuards,
@@ -17,7 +18,7 @@ import { UpdateUserInfoDto } from 'src/application/auth/dto/auth-info.dto';
 export class AuthInfoController {
   constructor(private authInfoService: AuthInfoService) {}
 
-  @Get('/')
+  @Get('/info')
   @UseGuards(AuthGuard)
   async getUserInfo(@User() user: UserInfo) {
     const result = await this.authInfoService.getUserInfo(user.id);
@@ -28,7 +29,7 @@ export class AuthInfoController {
     return response.of();
   }
 
-  @Put('/')
+  @Put('/update')
   @UsePipes(CustomValidationPipe)
   @UseGuards(AuthGuard)
   async updateUserInfo(
@@ -38,6 +39,15 @@ export class AuthInfoController {
     await this.authInfoService.updateUserInfo(user.id, UpdateUserInfoDto);
 
     const response = new JsonResponse();
-    response.of();
+    return response.of();
+  }
+
+  @Delete('/delete')
+  @UseGuards(AuthGuard)
+  async deleteUser(@User() user: UserInfo) {
+    await this.authInfoService.deleteUser(user.id);
+
+    const response = new JsonResponse();
+    return response.of();
   }
 }

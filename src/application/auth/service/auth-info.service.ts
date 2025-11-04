@@ -6,7 +6,6 @@ import { GlobalException } from 'src/core/exception/global.exception';
 import { ErrorCode } from 'src/core/exception/error-code';
 
 import { UserQuery } from 'src/application/DB/query/user.query';
-// import { User, UserDocument } from 'src/application/DB/entity/user.entity';
 import { UpdateUserInfoDto } from 'src/application/auth/dto/auth-info.dto';
 
 @Injectable()
@@ -38,7 +37,7 @@ export class AuthInfoService {
     }
   }
 
-  async updateUserInfo(userId: string, userInfo: UpdateUserInfoDto) {
+  async updateUserInfo(userId: string, updateUserInfo: UpdateUserInfoDto) {
     try {
       const user = this.userQuery.findById(userId);
 
@@ -51,11 +50,36 @@ export class AuthInfoService {
         );
       }
 
-      await this.userQuery.updateUserInfo(userId, userInfo);
+      console.log(user, updateUserInfo);
+
+      await this.userQuery.updateUserInfo(userId, updateUserInfo);
 
       this.logger.log('AuthInfoService.updateUserInfo success.');
     } catch (error) {
       this.logger.error('AuthInfoService.updateUserInfo failed.');
+      this.logger.error(error);
+      throw error;
+    }
+  }
+
+  async deleteUser(userId: string) {
+    try {
+      const user = this.userQuery.findById(userId);
+
+      if (user == null) {
+        this.logger.error(`User not found: ${userId}`);
+        throw new GlobalException(
+          'User not found',
+          404,
+          ErrorCode.USER_NOT_FOUND,
+        );
+      }
+
+      await this.userQuery.deleteUser(userId);
+
+      this.logger.log('AuthInfoService.deleteUser success.');
+    } catch (error) {
+      this.logger.error('AuthInfoService.deleteUser failed.');
       this.logger.error(error);
       throw error;
     }
