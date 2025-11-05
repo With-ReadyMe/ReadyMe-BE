@@ -15,6 +15,7 @@ import { AuthGuard } from '../../../core/guard/auth.guard';
 import { CreateProjectDto, UpdateProjectDto } from '../dto/project.dto';
 import { User, UserInfo } from 'src/core/guard/decorator/user.decorator';
 import { ProjectDocument } from 'src/application/DB/entity/project.entity';
+import { JsonResponse } from 'src/core/utils/json-response';
 
 @UseGuards(AuthGuard)
 @Controller('project')
@@ -34,25 +35,27 @@ export class ProjectController {
       user_id,
       createProjectDto,
     );
-    return {
-      statusCode: HttpStatus.CREATED,
-      message: '프로젝트가 성공적으로 등록되었습니다.',
-      data: project,
-    };
+    const response = new JsonResponse();
+    response.set('data', project);
+
+    response.set('statusCode', HttpStatus.CREATED);
+    response.set('message', '프로젝트가 성공적으로 등록되었습니다.');
+
+    return response.of();
   }
 
   @Get()
-  async getProjects(@User() user: UserInfo): Promise<object> {
+  async getProjects(@User() user: UserInfo) {
     const userId = user.id;
 
     const projects: ProjectDocument[] =
       await this.projectService.findUserProjects(userId);
 
-    return {
-      statusCode: HttpStatus.OK,
-      message: '프로젝트 목록 조회 성공',
-      data: projects,
-    };
+    const response = new JsonResponse();
+    response.set('data', projects);
+    response.set('message', '프로젝트 목록 조회 성공');
+
+    return response.of();
   }
 
   @Patch('/update/:projectId')
@@ -67,11 +70,11 @@ export class ProjectController {
       updateProjectDto,
     );
 
-    return {
-      statusCode: HttpStatus.OK,
-      message: '프로젝트가 성공적으로 수정되었습니다.',
-      data: updatedProject,
-    };
+    const response = new JsonResponse();
+    response.set('data', updatedProject);
+    response.set('message', '프로젝트가 성공적으로 수정되었습니다.');
+
+    return response.of();
   }
 
   @Get('/:projectId')
@@ -84,22 +87,23 @@ export class ProjectController {
       projectId,
     );
 
-    return {
-      statusCode: HttpStatus.OK,
-      message: '프로젝트 조회 성공',
-      data: project,
-    };
+    const response = new JsonResponse();
+    response.set('data', project);
+    response.set('message', '프로젝트 조회 성공');
+
+    return response.of();
   }
 
   @Delete('/:projectId')
   async deleteProject(
     @Param('projectId') projectId: string,
     @User() user: UserInfo,
-  ): Promise<object> {
+  ) {
     await this.projectService.deleteProject(user.id, projectId);
-    return {
-      statusCode: HttpStatus.OK,
-      message: '프로젝트가 성공적으로 삭제되었습니다.',
-    };
+
+    const response = new JsonResponse();
+    response.set('message', '프로젝트가 성공적으로 삭제되었습니다.');
+
+    return response.of();
   }
 }

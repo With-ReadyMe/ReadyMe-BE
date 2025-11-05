@@ -1,5 +1,6 @@
-import { Controller, Get, HttpStatus } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { PublicService } from '../service/public.service';
+import { JsonResponse } from 'src/core/utils/json-response';
 
 @Controller('public')
 export class PublicController {
@@ -9,10 +10,8 @@ export class PublicController {
   async getPublicProjects(): Promise<object> {
     const projects = await this.publicService.getPublicProjects();
 
-    return {
-      statusCode: HttpStatus.OK,
-      message: '전체 공개 프로젝트 목록 조회 성공',
-      data: projects,
-    };
+    const response = new JsonResponse();
+    response.set('data', projects);
+    return response.of();
   }
 }
