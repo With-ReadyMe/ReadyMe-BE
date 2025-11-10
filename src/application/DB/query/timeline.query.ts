@@ -5,18 +5,79 @@ import {
   TimelineDocument,
   TimelineType,
 } from '../entity/timeline.entity';
-import { Model, Types } from 'mongoose';
+import { DeleteResult, Model, Types } from 'mongoose';
 import { Project, ProjectDocument } from '../entity/project.entity';
+import {
+  CreateTimelineDto,
+  UpdateTimelineDto,
+} from 'src/application/timeline/dto/timeline.dto';
 
 @Injectable()
 export class TimelineQuery {
   constructor(
     @InjectModel(Timeline.name) private timelineModel: Model<TimelineDocument>,
   ) {}
+  async createTimeline(
+    userId: string,
+    createTimelineDto: CreateTimelineDto,
+  ): Promise<TimelineDocument> {
+    const createdTimeline = new this.timelineModel({
+      user_id: new Types.ObjectId(userId),
+      type: createTimelineDto.type,
+      title: createTimelineDto.title,
+      description: createTimelineDto.description || null,
+      org: createTimelineDto.org || null,
+      role: createTimelineDto.role || null,
+      link_url: createTimelineDto.link_url || null,
+      start_at: createTimelineDto.start_at,
+      end_at: createTimelineDto.end_at || null,
+    });
+
+    return createdTimeline.save();
+  }
+
+  async updateTimeline(
+    timelineId: string,
+    userId: string,
+    updateTimelineDto: UpdateTimelineDto,
+  ): Promise<TimelineDocument> {
+    const filter = {
+      _id: new Types.ObjectId(timelineId),
+      user_id: new Types.ObjectId(userId),
+    };
+
+    const updateData = {
+      ...updateTimelineDto,
+    };
+
+    const updatedTimeline = await this.timelineModel // [2] await로 결과를 받음
+      .findOneAndUpdate(filter, { $set: updateData }, { new: true })
+      .exec();
+
+    // [3] null 체크 로직 추가
+    if (!updatedTimeline) {
+      throw new Error( // 또는 NestJS의 NotFoundException
+        `Timeline not found or user ${userId} does not have permission.`,
+      );
+    }
+
+    // [4] null이 아님이 보장된 상태로 반환
+    return updatedTimeline;
+  }
+
+  async deleteTimeline(
+    timelineId: string,
+    userId: string,
+  ): Promise<DeleteResult> {
+    return this.timelineModel.deleteOne({
+      _id: new Types.ObjectId(timelineId),
+      user_id: new Types.ObjectId(userId),
+    });
+  }
   async createTimelineForProject(
     userId: string,
     project: Project,
-  ): Promise<Timeline> {
+  ): Promise<TimelineDocument> {
     const createdTimeline = new this.timelineModel({
       user_id: new Types.ObjectId(userId),
       type: TimelineType.PROJECT,
@@ -36,6 +97,7 @@ export class TimelineQuery {
 
     return createdTimeline.save();
   }
+
   async updateTimelineForProject(
     project: ProjectDocument,
   ): Promise<TimelineDocument> {
@@ -85,5 +147,12 @@ export class TimelineQuery {
       user_id: new Types.ObjectId(userId),
       type: TimelineType.PROJECT,
     });
+  }
+
+  async findAllByUserId(userId: string): Promise<TimelineDocument[]> {
+    return this.timelineModel
+      .find({ user_id: new Types.ObjectId(userId) })
+      .sort({ start_at: 1, end_at: -1 })
+      .exec();
   }
 }
