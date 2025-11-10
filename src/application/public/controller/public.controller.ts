@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, HttpStatus } from '@nestjs/common';
 import { PublicService } from '../service/public.service';
 import { JsonResponse } from 'src/core/utils/json-response';
 
@@ -12,6 +12,7 @@ export class PublicController {
 
     const response = new JsonResponse();
     response.set('data', projects);
+    response.set('statusCode', HttpStatus.OK);
     return response.of();
   }
 }

@@ -53,6 +53,7 @@ export class ProjectController {
 
     const response = new JsonResponse();
     response.set('data', projects);
+    response.set('statusCode', HttpStatus.OK);
     response.set('message', '프로젝트 목록 조회 성공');
 
     return response.of();
@@ -72,6 +73,7 @@ export class ProjectController {
 
     const response = new JsonResponse();
     response.set('data', updatedProject);
+    response.set('statusCode', HttpStatus.OK);
     response.set('message', '프로젝트가 성공적으로 수정되었습니다.');
 
     return response.of();
@@ -89,6 +91,7 @@ export class ProjectController {
 
     const response = new JsonResponse();
     response.set('data', project);
+    response.set('statusCode', HttpStatus.OK);
     response.set('message', '프로젝트 조회 성공');
 
     return response.of();
@@ -102,6 +105,7 @@ export class ProjectController {
     await this.projectService.deleteProject(user.id, projectId);
 
     const response = new JsonResponse();
+    response.set('statusCode', HttpStatus.NO_CONTENT);
     response.set('message', '프로젝트가 성공적으로 삭제되었습니다.');
 
     return response.of();
