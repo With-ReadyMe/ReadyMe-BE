@@ -21,7 +21,7 @@ import { JsonResponse } from 'src/core/utils/json-response';
 @Controller('project')
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
-  @Post('/create')
+  @Post()
   async createProject(
     @Body() createProjectDto: CreateProjectDto,
     @User() user: UserInfo,
@@ -59,7 +59,7 @@ export class ProjectController {
     return response.of();
   }
 
-  @Patch('/update/:projectId')
+  @Patch('/:projectId')
   async updateProject(
     @Param('projectId') projectId: string,
     @Body() updateProjectDto: UpdateProjectDto,
