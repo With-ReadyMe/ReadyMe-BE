@@ -96,48 +96,77 @@ export class ProjectService {
     projectId: string,
     updateProjectDto: UpdateProjectDto,
   ): Promise<ProjectDocument> {
-    const project = await this.projectQuery.findById(projectId);
-    if (!project) {
-      throw new GlobalException(
-        '해당 ID의 프로젝트를 찾을 수 없습니다.',
-        HttpStatus.NOT_FOUND,
-        ErrorCode.NOT_UPDATE,
-      );
-    }
-    const updatedProject = await this.projectQuery.updateProject(
-      projectId,
-      updateProjectDto,
-    );
-
-    if (!updatedProject) {
-      throw new NotFoundException('해당 ID의 프로젝트를 찾을 수 없습니다.');
-    }
-
     try {
-      const updatedTimeline =
-        await this.timelineQuery.updateTimelineForProject(updatedProject);
+      this.logger.log(
+        `Attempting to update project ID: ${projectId} by user: ${userId}`,
+      );
 
-      if (!updatedTimeline) {
-        console.warn(
-          `[Timeline Sync WARN] Timeline not found for Project ID: ${projectId}. Skipping update.`,
-        );
-      } else {
-        console.log(
-          `[Timeline Sync INFO] Timeline successfully updated for Project ID: ${projectId}.`,
+      const project = await this.projectQuery.findById(projectId);
+      if (!project) {
+        this.logger.error(`Project not found with ID: ${projectId}`);
+        throw new GlobalException(
+          '해당 ID의 프로젝트를 찾을 수 없습니다.',
+          HttpStatus.NOT_FOUND,
+          ErrorCode.NOT_UPDATE,
         );
       }
+
+      const updatedProject = await this.projectQuery.updateProject(
+        projectId,
+        updateProjectDto,
+      );
+
+      if (!updatedProject) {
+        this.logger.error(`Failed to update project with ID: ${projectId}`);
+        throw new GlobalException(
+          '프로젝트 업데이트에 실패했습니다.',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+          ErrorCode.ERROR,
+        );
+      }
+
+      try {
+        const updatedTimeline =
+          await this.timelineQuery.updateTimelineForProject(updatedProject);
+
+        if (!updatedTimeline) {
+          this.logger.warn(
+            `[Timeline Sync WARN] Timeline not found for Project ID: ${projectId}. Skipping update.`,
+          );
+        } else {
+          this.logger.log(
+            `[Timeline Sync INFO] Timeline successfully updated for Project ID: ${projectId}.`,
+          );
+        }
+      } catch (timelineError) {
+        this.logger.error(
+          `[Timeline Sync ERROR] Failed to update timeline for Project ID: ${projectId}`,
+        );
+        this.logger.error(timelineError);
+      }
+
+      this.logger.log('ProjectService.updateProject success.');
+      return updatedProject;
     } catch (error) {
-      console.error(
-        `[Timeline Sync ERROR] Failed to update timeline for Project ID: ${projectId}`,
-        error,
+      if (error instanceof GlobalException) {
+        throw error;
+      }
+
+      this.logger.error(
+        `ProjectService.updateProject failed unexpectedly for Project ${projectId}.`,
+      );
+      this.logger.error(error);
+
+      throw new GlobalException(
+        '프로젝트를 업데이트하는 중 알 수 없는 오류가 발생했습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        ErrorCode.ERROR,
       );
     }
-
-    return updatedProject;
   }
 
   async getProjectDetail(
-    userId: string | null,
+    userId: string,
     projectId: string,
   ): Promise<ProjectDocument> {
     try {
