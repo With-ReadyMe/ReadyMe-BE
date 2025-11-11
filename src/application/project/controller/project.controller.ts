@@ -7,7 +7,6 @@ import {
   Param,
   Patch,
   Post,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { ProjectService } from '../service/project.service';
@@ -16,6 +15,8 @@ import { CreateProjectDto, UpdateProjectDto } from '../dto/project.dto';
 import { User, UserInfo } from 'src/core/guard/decorator/user.decorator';
 import { ProjectDocument } from 'src/application/DB/entity/project.entity';
 import { JsonResponse } from 'src/core/utils/json-response';
+import { GlobalException } from 'src/core/exception/global.exception';
+import { ErrorCode } from 'src/core/exception/error-code';
 
 @UseGuards(AuthGuard)
 @Controller('project')
@@ -29,7 +30,11 @@ export class ProjectController {
     const user_id = user.id;
 
     if (!user_id) {
-      throw new UnauthorizedException('인증된 사용자 ID를 찾을 수 없습니다.');
+      throw new GlobalException(
+        '인증된 사용자 ID를 찾을 수 없습니다.',
+        HttpStatus.UNAUTHORIZED,
+        ErrorCode.USER_NOT_FOUND,
+      );
     }
     const project = await this.projectService.createProject(
       user_id,
@@ -53,7 +58,6 @@ export class ProjectController {
 
     const response = new JsonResponse();
     response.set('data', projects);
-    response.set('statusCode', HttpStatus.OK);
     response.set('message', '프로젝트 목록 조회 성공');
 
     return response.of();
@@ -73,7 +77,6 @@ export class ProjectController {
 
     const response = new JsonResponse();
     response.set('data', updatedProject);
-    response.set('statusCode', HttpStatus.OK);
     response.set('message', '프로젝트가 성공적으로 수정되었습니다.');
 
     return response.of();
@@ -91,7 +94,6 @@ export class ProjectController {
 
     const response = new JsonResponse();
     response.set('data', project);
-    response.set('statusCode', HttpStatus.OK);
     response.set('message', '프로젝트 조회 성공');
 
     return response.of();

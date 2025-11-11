@@ -7,7 +7,6 @@ import {
   Param,
   Patch,
   Post,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { TimelineService } from '../service/timeline.service';
@@ -15,6 +14,8 @@ import { AuthGuard } from 'src/core/guard/auth.guard';
 import { User, UserInfo } from 'src/core/guard/decorator/user.decorator';
 import { JsonResponse } from 'src/core/utils/json-response';
 import { CreateTimelineDto, UpdateTimelineDto } from '../dto/timeline.dto';
+import { GlobalException } from 'src/core/exception/global.exception';
+import { ErrorCode } from 'src/core/exception/error-code';
 
 @UseGuards(AuthGuard)
 @Controller('timeline')
@@ -29,7 +30,11 @@ export class TimelineController {
     const userId = user.id;
 
     if (!userId) {
-      throw new UnauthorizedException('인증된 사용자 ID를 찾을 수 없습니다.');
+      throw new GlobalException(
+        '인증된 사용자 ID를 찾을 수 없습니다.',
+        HttpStatus.UNAUTHORIZED,
+        ErrorCode.USER_NOT_FOUND,
+      );
     }
 
     const timeline = await this.timelineService.createTimeline(
@@ -59,7 +64,6 @@ export class TimelineController {
 
     const response = new JsonResponse();
     response.set('data', updatedTimeline);
-    response.set('statusCode', HttpStatus.OK);
     response.set('message', '타임라인이 성공적으로 수정되었습니다.');
 
     return response.of();
@@ -86,7 +90,6 @@ export class TimelineController {
     const timelines = await this.timelineService.findAllByUserId(userId);
     const response = new JsonResponse();
     response.set('data', timelines);
-    response.set('statusCode', HttpStatus.OK);
     response.set('message', '타임라인 목록 조회 성공');
     return response.of();
   }
