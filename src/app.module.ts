@@ -8,6 +8,7 @@ import { DbModule } from './application/DB/db.module';
 import { LoggingModule } from './core/interceptors/logging/logging.module';
 import { ProjectsModule } from './application/project/project.module';
 import { PublicModule } from './application/public/public.module';
+import { TimelineModule } from './application/timeline/timeline.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { PublicModule } from './application/public/public.module';
     DbModule,
     ProjectsModule,
     PublicModule,
+    TimelineModule,
   ],
   controllers: [AppController],
   providers: [AppService],
