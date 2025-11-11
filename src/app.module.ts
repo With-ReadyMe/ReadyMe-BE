@@ -3,10 +3,12 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-
 import { AuthModule } from './application/auth/auth.module';
 import { DbModule } from './application/DB/db.module';
 import { LoggingModule } from './core/interceptors/logging/logging.module';
+import { ProjectsModule } from './application/project/project.module';
+import { PublicModule } from './application/public/public.module';
+import { TimelineModule } from './application/timeline/timeline.module';
 
 @Module({
   imports: [
@@ -27,6 +29,9 @@ import { LoggingModule } from './core/interceptors/logging/logging.module';
     LoggingModule,
     AuthModule,
     DbModule,
+    ProjectsModule,
+    PublicModule,
+    TimelineModule,
   ],
   controllers: [AppController],
   providers: [AppService],
